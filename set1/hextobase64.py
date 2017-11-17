@@ -1,8 +1,6 @@
 #!/usr/bin/python
 
 base64dict = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
-print "Enter a hex string: "
-hex_input = raw_input().strip()
 
 def padto(string, length, c):
     return c * (length - len(string)) + string
@@ -15,8 +13,6 @@ def hex2bytearr(hexstring):
 def bytearr2binstring(bytearr):
     return "".join([padto(bin(x)[2:], 8, '0') for x in bytearr])
 
-temp = bytearr2binstring(hex2bytearr(hex_input))
-#correct
 #maps a 6 bit pattern to the respective dict
 def base64map(bits):
     a = int(bits, 2)
@@ -52,18 +48,36 @@ def padstring(bitstring):
 #splits the bitstring to a list of list of 3 octets
 def split3octets(bitstring):
     return [bitstring[x:x+24]  for x in range(0, len(bitstring), 24)]
-base64string = ""
 
-if len(temp) % 24 == 0:
-    octets3 = split3octets(temp)
-    for octet3 in octets3:
-        base64string += mapoctets3(octet3)
-else:
-    bs, padlen = padstring(temp)
-    octets3 = split3octets(bs)
-    for octet3 in octets3[:-1]:
-        base64string += mapoctets3(octet3)
-    base64string += map_last_octet3(octets3[-1], padlen)
 
-print base64string
+def base64(hex_input):
+    temp = bytearr2binstring(hex2bytearr(hex_input))
+    base64string = ""
+    if len(temp) % 24 == 0:
+        octets3 = split3octets(temp)
+        for octet3 in octets3:
+            base64string += mapoctets3(octet3)
+    else:
+        bs, padlen = padstring(temp)
+        octets3 = split3octets(bs)
+        for octet3 in octets3[:-1]:
+            base64string += mapoctets3(octet3)
+        base64string += map_last_octet3(octets3[-1], padlen)
 
+    return base64string
+
+
+def ascii_to_hex(s):
+    hexstr = ""
+    for c in s:
+        t = hex(ord(c))[2:]
+        if len(t) < 2:
+            t = "0" + t
+        hexstr += t
+    return hexstr
+
+if __name__ == "__main__":
+    print "Enter a string: "
+    inp = raw_input().strip()
+    hex_inp = ascii_to_hex(inp)
+    print base64(hex_inp)
